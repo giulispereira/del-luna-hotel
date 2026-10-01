@@ -1,0 +1,312 @@
+:root {
+  --primary-purple: #1e102d;      /* Roxo escuro místico */
+  --secondary-purple: #2a183d;    /* Roxo intermediário */
+  --accent-gold: #d4af37;         /* Dourado elegante */
+  --accent-gold-hover: #f1c40f;   /* Dourado mais claro para efeito hover */
+  --dark-gray: #121214;           /* Cinza escuro / quase preto */
+  --card-bg: #1a1823;             /* Cinza escuro arroxeado para os cards */
+  --text-light: #e0e0e0;          /* Texto claro */
+  --text-muted: #a0a0b0;          /* Texto secundário */
+  --card-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  --gold-glow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Títulos usando a fonte sofisticada Cinzel */
+h1, h2, h3, h4, .nav-btn, .destaque-tag {
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 1.5px;
+}
+
+body {
+  background-color: var(--dark-gray);
+  color: var(--text-light);
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background-color: var(--primary-purple);
+  color: #fff;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  border-bottom: 2px solid var(--accent-gold);
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.nav-btn {
+  background: transparent;
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  padding: 0.6rem 1.4rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: var(--accent-gold);
+  color: var(--primary-purple);
+  box-shadow: var(--gold-glow);
+}
+
+/* Container Principal */
+.container {
+  max-width: 1150px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Hero / Seção de Busca */
+.hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.hero h2 {
+  font-size: 2.2rem;
+  margin-bottom: 0.6rem;
+  color: var(--accent-gold);
+}
+
+.hero p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.search-bar {
+  margin-top: 1.8rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  padding: 0.8rem 1.2rem;
+  width: 320px;
+  background-color: var(--secondary-purple);
+  border: 1px solid var(--accent-gold);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #fff;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Grid de Cards dos Quartos */
+.quartos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.quarto-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quarto-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent-gold);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+}
+
+.quarto-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.quarto-info {
+  padding: 1.5rem;
+}
+
+.quarto-info h3 {
+  margin-bottom: 0.6rem;
+  color: #fff;
+  font-size: 1.3rem;
+}
+
+.quarto-info p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.quarto-preco {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--accent-gold);
+  margin: 1rem 0;
+  font-family: 'Cinzel', serif;
+}
+
+.destaque-tag {
+  background-color: var(--accent-gold);
+  color: var(--primary-purple);
+  padding: 0.2rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 3px;
+  float: right;
+}
+
+/* Botão Principal */
+.submit-btn {
+  background-color: var(--accent-gold);
+  color: var(--primary-purple);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: var(--accent-gold-hover);
+  box-shadow: var(--gold-glow);
+}
+
+/* Painel Administrativo */
+.admin-section {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: var(--card-shadow);
+  margin-bottom: 2.5rem;
+}
+
+.admin-section h2 {
+  margin-bottom: 1.5rem;
+  color: var(--accent-gold);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.form-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-input {
+  padding: 0.7rem;
+  background-color: var(--secondary-purple);
+  border: 1px solid #44325a;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+/* Tabela de Reservas */
+.table-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th, td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+th {
+  background-color: var(--secondary-purple);
+  color: var(--accent-gold);
+  font-family: 'Cinzel', serif;
+}
+
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+.badge.reservado { background-color: #d35400; }
+.badge.checkin { background-color: #27ae60; }
+.badge.checkout { background-color: #2980b9; }
+.badge.cancelado { background-color: #c0392b; }
+
+.action-btn {
+  padding: 0.4rem 0.8rem;
+  margin-right: 0.3rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-checkin { background-color: #27ae60; }
+.btn-checkout { background-color: #2980b9; }
+
+/* Modais de Autenticação e Reserva */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent-gold);
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+}
+
+.modal-content h2 {
+  color: var(--accent-gold);
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
