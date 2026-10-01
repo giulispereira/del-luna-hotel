@@ -10,6 +10,9 @@ function App() {
   const [minhasReservas, setMinhasReservas] = useState([]);
   const [usuariosLista, setUsuariosLista] = useState([]);
   const [busca, setBusca] = useState('');
+  
+  // Estado para armazenar as respostas dinâmicas da IA recebidas do backend
+  const [iaData, setIaData] = useState({});
 
   // Sistema de Notificações Customizadas
   const [notificacao, setNotificacao] = useState(null);
@@ -53,8 +56,23 @@ function App() {
       const res = await fetch(`${API_URL}/quartos${busca ? `?tipo=${busca}` : ''}`);
       const data = await res.json();
       setQuartos(data);
+
+      // Consulta REAL via Backend à API de IA para cada quarto carregado
+      data.forEach(q => buscarInfoIA(q.id));
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const buscarInfoIA = async (quartoId) => {
+    try {
+      const res = await fetch(`${API_URL}/quartos/${quartoId}/ia-info`);
+      if (res.ok) {
+        const data = await res.json();
+        setIaData(prev => ({ ...prev, [quartoId]: data.iaInfo }));
+      }
+    } catch (err) {
+      console.error("Erro ao buscar IA:", err);
     }
   };
 
@@ -354,6 +372,30 @@ function App() {
                     <h3>Quarto {quarto.numero} - {quarto.tipo}</h3>
                     <p><strong>Capacidade:</strong> {quarto.capacidade} pessoa(s)</p>
                     <p>{quarto.descricao}</p>
+
+                    {/* 🌟 REQUISITO 3: Exibição dinamicamente obtida por IA */}
+                    <div style={{
+                      marginTop: '0.8rem',
+                      marginBottom: '0.8rem',
+                      padding: '0.7rem',
+                      backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem'
+                    }}>
+                      <p style={{ color: '#d4af37', fontWeight: 'bold', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        ✨ Destaques da Suíte (via IA):
+                      </p>
+                      
+                      <p style={{ color: '#ccc', margin: 0, whiteSpace: 'pre-line', lineHeight: '1.4' }}>
+                        {iaData[quarto.id] || "Consultando Inteligência Artificial..."}
+                      </p>
+
+                      <p style={{ fontSize: '0.7rem', color: '#888', fontStyle: 'italic', marginTop: '0.4rem', textAlign: 'right', margin: 0 }}>
+                        * Informações geradas por IA.
+                      </p>
+                    </div>
+
                     <div className="quarto-preco">R$ {Number(quarto.preco_diaria).toFixed(2)} / noite</div>
                     <button className="submit-btn" style={{ width: '100%' }} onClick={() => handleClicarReservar(quarto)}>
                       Reservar Agora
@@ -417,6 +459,55 @@ function App() {
 
         {aba === 'admin' && (
           <div>
+            {/* 📊 REQUISITO 9: Dashboard na Área Restrita com gráficos de Visão Geral do Sistema */}
+            <section className="admin-section" style={{ marginBottom: '2rem' }}>
+              <h2>Visão Geral do Sistema</h2>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                <div style={{ background: '#1e272e', padding: '1.2rem', borderRadius: '8px', border: '1px solid #d4af37', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#aaa' }}>Nº de Clientes</span>
+                  <h3 style={{ fontSize: '1.8rem', color: '#d4af37', margin: '0.3rem 0 0 0' }}>{usuariosLista.length}</h3>
+                </div>
+                <div style={{ background: '#1e272e', padding: '1.2rem', borderRadius: '8px', border: '1px solid #e74c3c', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#aaa' }}>Nº de Quartos</span>
+                  <h3 style={{ fontSize: '1.8rem', color: '#e74c3c', margin: '0.3rem 0 0 0' }}>{quartos.length}</h3>
+                </div>
+                <div style={{ background: '#1e272e', padding: '1.2rem', borderRadius: '8px', border: '1px solid #2ecc71', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#aaa' }}>Nº de Reservas</span>
+                  <h3 style={{ fontSize: '1.8rem', color: '#2ecc71', margin: '0.3rem 0 0 0' }}>{reservas.length}</h3>
+                </div>
+              </div>
+
+              {/* Gráfico Visual de Estado das Reservas */}
+              <div style={{ marginTop: '1.5rem', background: '#1e272e', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.2)' }}>
+                <h4 style={{ color: '#d4af37', marginBottom: '0.8rem', fontSize: '0.95rem' }}>Estatísticas das Reservas (Status)</h4>
+                
+                <div style={{ display: 'flex', height: '24px', borderRadius: '12px', overflow: 'hidden', background: '#333' }}>
+                  <div style={{ 
+                    width: `${reservas.length ? (reservas.filter(r => r.status === 'reservado').length / reservas.length) * 100 : 0}%`, 
+                    background: '#f39c12',
+                    transition: 'width 0.5s ease-in-out'
+                  }} title="Reservadas" />
+                  <div style={{ 
+                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkin').length / reservas.length) * 100 : 0}%`, 
+                    background: '#2ecc71',
+                    transition: 'width 0.5s ease-in-out'
+                  }} title="Check-in" />
+                  <div style={{ 
+                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkout').length / reservas.length) * 100 : 0}%`, 
+                    background: '#3498db',
+                    transition: 'width 0.5s ease-in-out'
+                  }} title="Check-out" />
+                </div>
+
+                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.8rem', fontSize: '0.85rem', color: '#ccc', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🟡 Reservadas: <strong>{reservas.filter(r => r.status === 'reservado').length}</strong></span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🟢 Check-in: <strong>{reservas.filter(r => r.status === 'checkin').length}</strong></span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🔵 Check-out: <strong>{reservas.filter(r => r.status === 'checkout').length}</strong></span>
+                </div>
+              </div>
+            </section>
+
             <section className="admin-section">
               <h2>Cadastrar Novo Quarto</h2>
               <form onSubmit={handleCadastrarQuarto}>

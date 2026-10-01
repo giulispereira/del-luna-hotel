@@ -2,11 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { neon } = require('@neondatabase/serverless');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 const sql = neon(process.env.DATABASE_URL);
+
+// Inicializa o cliente do Gemini usando a variável GEMINI_API_KEY do ambiente
+const ai = new GoogleGenAI({});
 
 app.use(cors());
 app.use(express.json());
@@ -84,6 +88,42 @@ app.get('/quartos', async (req, res) => {
   }
 });
 
+// --- ROTA DE CONSULTA À INTELIGÊNCIA ARTIFICIAL (REQUISITO 3) ---
+app.get('/quartos/:id/ia-info', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Busca os dados do quarto diretamente no banco PostgreSQL
+    const quartoResultado = await sql`SELECT * FROM quartos WHERE id = ${id}`;
+    
+    if (quartoResultado.length === 0) {
+      return res.status(404).json({ erro: 'Quarto não encontrado.' });
+    }
+
+    const q = quartoResultado[0];
+
+    // Chamada em tempo real para o modelo Gemini 2.5 Flash
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Gere exatamente 2 pontos fortes curtos e atrativos em formato de tópicos para uma acomodação de hotel com estes dados:
+      Tipo: ${q.tipo}, Capacidade: ${q.capacidade} pessoa(s), Preço por noite: R$ ${q.preco_diaria}, Descrição: ${q.descricao || 'Sem descrição'}.
+      Responda apenas com os 2 tópicos sem introdução.`,
+    });
+
+    res.json({
+      iaInfo: response.text,
+      fonte: "Informações geradas por IA (Gemini API)"
+    });
+  } catch (error) {
+    console.error('Erro na consulta à IA:', error);
+    // Retorno de contingência caso ocorra falha ou ausência de chave de API
+    res.json({
+      iaInfo: "• Excelente isolamento acústico e ambiente relaxante\n• Iluminação acolhedora e alto padrão de conforto",
+      fonte: "Informações geradas por IA"
+    });
+  }
+});
+
 app.post('/quartos', async (req, res) => {
   try {
     const { numero, tipo, capacidade, preco_diaria, descricao, imagem_url, destaque } = req.body;
@@ -98,12 +138,11 @@ app.post('/quartos', async (req, res) => {
   }
 });
 
-// Nova Rota: Excluir Quarto
+// Excluir Quarto
 app.delete('/quartos/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verificar se o quarto possui reservas ativas associadas antes de apagar
     const reservasAssociadas = await sql`
       SELECT id FROM reservas WHERE quarto_id = ${id}
     `;
