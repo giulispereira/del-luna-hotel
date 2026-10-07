@@ -16,7 +16,6 @@ function App() {
 
   // Sistema de Notificações Customizadas
   const [notificacao, setNotificacao] = useState(null);
-
   const mostrarAviso = (mensagem, tipo = 'sucesso') => {
     setNotificacao({ mensagem, tipo });
     setTimeout(() => {
@@ -56,7 +55,6 @@ function App() {
       const res = await fetch(`${API_URL}/quartos${busca ? `?tipo=${busca}` : ''}`);
       const data = await res.json();
       setQuartos(data);
-
       // Consulta REAL via Backend à API de IA para cada quarto carregado
       data.forEach(q => buscarInfoIA(q.id));
     } catch (err) {
@@ -137,7 +135,6 @@ function App() {
     e.preventDefault();
     const endpoint = modoCadastro ? '/cadastrar' : '/login';
     const bodyData = modoCadastro ? { nome, email, senha } : { email, senha };
-
     try {
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
@@ -145,7 +142,6 @@ function App() {
         body: JSON.stringify(bodyData)
       });
       const data = await res.json();
-
       if (res.ok) {
         const userLogado = modoCadastro ? data : data.usuario;
         setUsuario(userLogado);
@@ -174,9 +170,7 @@ function App() {
       setModalAuth(true);
       return;
     }
-
     const idDoHospede = usuario.tipo === 'admin' ? usuarioSelecionadoId : usuario.id;
-
     try {
       const res = await fetch(`${API_URL}/reservas`, {
         method: 'POST',
@@ -188,9 +182,7 @@ function App() {
           data_checkout: dataCheckout
         })
       });
-
       const errData = await res.json();
-
       if (res.ok) {
         mostrarAviso('Reserva efetuada com sucesso!', 'sucesso');
         setQuartoSelecionado(null);
@@ -223,10 +215,10 @@ function App() {
           destaque
         })
       });
-
       if (res.ok) {
         mostrarAviso('Quarto cadastrado com sucesso!', 'sucesso');
-        setNumero(''); setTipo(''); setCapacidade(''); setPrecoDiaria(''); setDescricao(''); setImagemUrl(''); setDestaque(false);
+        setNumero(''); setTipo(''); setCapacidade(''); setPrecoDiaria('');
+        setDescricao(''); setImagemUrl(''); setDestaque(false);
         carregarQuartos();
       }
     } catch (err) {
@@ -331,13 +323,11 @@ function App() {
                   Minhas Reservas
                 </button>
               )}
-
               {usuario.tipo === 'admin' && (
                 <button className="nav-btn" onClick={() => setAba(aba === 'admin' ? 'home' : 'admin')}>
                   {aba === 'admin' ? 'Ver Vitrine' : 'Painel Admin'}
                 </button>
               )}
-
               <button className="nav-btn" style={{ borderColor: '#c0392b', color: '#c0392b' }} onClick={handleLogout}>Sair</button>
             </>
           ) : (
@@ -366,13 +356,17 @@ function App() {
             <div className="quartos-grid">
               {quartos.map((quarto) => (
                 <div key={quarto.id} className="quarto-card">
-                  <img src={quarto.imagem_url || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500'} alt={quarto.tipo} className="quarto-img" />
+                  <img 
+                    src={quarto.imagem_url || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=500'} 
+                    alt={quarto.tipo} 
+                    className="quarto-img" 
+                  />
                   <div className="quarto-info">
                     {quarto.destaque && <span className="destaque-tag">Destaque</span>}
                     <h3>Quarto {quarto.numero} - {quarto.tipo}</h3>
                     <p><strong>Capacidade:</strong> {quarto.capacidade} pessoa(s)</p>
                     <p>{quarto.descricao}</p>
-
+                    
                     {/* 🌟 REQUISITO 3: Exibição dinamicamente obtida por IA */}
                     <div style={{
                       marginTop: '0.8rem',
@@ -386,11 +380,9 @@ function App() {
                       <p style={{ color: '#d4af37', fontWeight: 'bold', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                         ✨ Destaques da Suíte (via IA):
                       </p>
-                      
                       <p style={{ color: '#ccc', margin: 0, whiteSpace: 'pre-line', lineHeight: '1.4' }}>
                         {iaData[quarto.id] || "Consultando Inteligência Artificial..."}
                       </p>
-
                       <p style={{ fontSize: '0.7rem', color: '#888', fontStyle: 'italic', marginTop: '0.4rem', textAlign: 'right', margin: 0 }}>
                         * Informações geradas por IA.
                       </p>
@@ -436,9 +428,9 @@ function App() {
                           <td><span className={`badge ${r.status}`}>{r.status.toUpperCase()}</span></td>
                           <td style={{ display: 'flex', justifyContent: 'center' }}>
                             {r.status === 'reservado' ? (
-                              <button 
-                                className="action-btn" 
-                                style={{ background: '#c0392b' }} 
+                              <button
+                                className="action-btn"
+                                style={{ background: '#c0392b' }}
                                 onClick={() => handleDeletarReserva(r.id)}
                               >
                                 Cancelar Reserva
@@ -459,7 +451,7 @@ function App() {
 
         {aba === 'admin' && (
           <div>
-            {/* 📊 REQUISITO 9: Dashboard na Área Restrita com gráficos de Visão Geral do Sistema */}
+            {/* 📊 REQUISITO 9: Dashboard na Área Restrita com gráficos */}
             <section className="admin-section" style={{ marginBottom: '2rem' }}>
               <h2>Visão Geral do Sistema</h2>
               
@@ -483,23 +475,22 @@ function App() {
                 <h4 style={{ color: '#d4af37', marginBottom: '0.8rem', fontSize: '0.95rem' }}>Estatísticas das Reservas (Status)</h4>
                 
                 <div style={{ display: 'flex', height: '24px', borderRadius: '12px', overflow: 'hidden', background: '#333' }}>
-                  <div style={{ 
-                    width: `${reservas.length ? (reservas.filter(r => r.status === 'reservado').length / reservas.length) * 100 : 0}%`, 
+                  <div style={{
+                    width: `${reservas.length ? (reservas.filter(r => r.status === 'reservado').length / reservas.length) * 100 : 0}%`,
                     background: '#f39c12',
                     transition: 'width 0.5s ease-in-out'
                   }} title="Reservadas" />
-                  <div style={{ 
-                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkin').length / reservas.length) * 100 : 0}%`, 
+                  <div style={{
+                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkin').length / reservas.length) * 100 : 0}%`,
                     background: '#2ecc71',
                     transition: 'width 0.5s ease-in-out'
                   }} title="Check-in" />
-                  <div style={{ 
-                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkout').length / reservas.length) * 100 : 0}%`, 
+                  <div style={{
+                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkout').length / reservas.length) * 100 : 0}%`,
                     background: '#3498db',
                     transition: 'width 0.5s ease-in-out'
                   }} title="Check-out" />
                 </div>
-
                 <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.8rem', fontSize: '0.85rem', color: '#ccc', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🟡 Reservadas: <strong>{reservas.filter(r => r.status === 'reservado').length}</strong></span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🟢 Check-in: <strong>{reservas.filter(r => r.status === 'checkin').length}</strong></span>
@@ -553,9 +544,9 @@ function App() {
                         <td>{q.capacidade} p.</td>
                         <td>R$ {Number(q.preco_diaria).toFixed(2)}</td>
                         <td style={{ display: 'flex', justifyContent: 'center' }}>
-                          <button 
-                            className="action-btn" 
-                            style={{ background: '#c0392b' }} 
+                          <button
+                            className="action-btn"
+                            style={{ background: '#c0392b' }}
                             onClick={() => handleDeletarQuarto(q.id, q.numero)}
                           >
                             Excluir Quarto
@@ -599,10 +590,9 @@ function App() {
                           {r.status === 'checkin' && (
                             <button className="action-btn btn-checkout" onClick={() => handleStatusReserva(r.id, 'checkout')}>Check-out</button>
                           )}
-                          
-                          <button 
-                            className="action-btn" 
-                            style={{ background: '#c0392b' }} 
+                          <button
+                            className="action-btn"
+                            style={{ background: '#c0392b' }}
                             onClick={() => handleDeletarReserva(r.id)}
                           >
                             Eliminar
@@ -618,42 +608,77 @@ function App() {
         )}
       </main>
 
+      {/* Modal de Autenticação */}
       {modalAuth && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>{modoCadastro ? 'Criar Conta' : 'Acessar Conta'}</h2>
             <form onSubmit={handleAuth}>
               {modoCadastro && (
-                <input className="form-input" style={{ width: '100%', marginBottom: '1rem' }} placeholder="Seu Nome Completo" value={nome} onChange={(e) => setNome(e.target.value)} required />
+                <input 
+                  className="form-input" 
+                  style={{ width: '100%', marginBottom: '1rem' }} 
+                  placeholder="Seu Nome Completo" 
+                  value={nome} 
+                  onChange={(e) => setNome(e.target.value)} 
+                  required 
+                />
               )}
-              <input className="form-input" style={{ width: '100%', marginBottom: '1rem' }} type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <input className="form-input" style={{ width: '100%', marginBottom: '1rem' }} type="password" placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} required />
+              <input 
+                className="form-input" 
+                style={{ width: '100%', marginBottom: '1rem' }} 
+                type="email" 
+                placeholder="E-mail" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+              />
+              <input 
+                className="form-input" 
+                style={{ width: '100%', marginBottom: '1rem' }} 
+                type="password" 
+                placeholder="Senha" 
+                value={senha} 
+                onChange={(e) => setSenha(e.target.value)} 
+                required 
+              />
               <button type="submit" className="submit-btn" style={{ width: '100%' }}>
                 {modoCadastro ? 'Cadastrar' : 'Entrar'}
               </button>
             </form>
-            <p style={{ marginTop: '1rem', textAlign: 'center', cursor: 'pointer', color: 'var(--accent-gold)' }} onClick={() => setModoCadastro(!modoCadastro)}>
+            <p 
+              style={{ marginTop: '1rem', textAlign: 'center', cursor: 'pointer', color: 'var(--accent-gold)' }} 
+              onClick={() => setModoCadastro(!modoCadastro)}
+            >
               {modoCadastro ? 'Já tem conta? Faça login' : 'Não tem conta? Cadastre-se'}
             </p>
-            <button className="action-btn" style={{ width: '100%', marginTop: '0.5rem', background: '#555' }} onClick={() => setModalAuth(false)}>Cancelar</button>
+            <button 
+              className="action-btn" 
+              style={{ width: '100%', marginTop: '0.5rem', background: '#555' }} 
+              onClick={() => setModalAuth(false)}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       )}
 
+      {/* Modal de Reserva */}
       {quartoSelecionado && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Reservar Quarto {quartoSelecionado.numero}</h2>
-            <p style={{ marginBottom: '1rem', color: 'var(--accent-gold)' }}>{quartoSelecionado.tipo} - R$ {quartoSelecionado.preco_diaria} / noite</p>
-            
+            <p style={{ marginBottom: '1rem', color: 'var(--accent-gold)' }}>
+              {quartoSelecionado.tipo} - R$ {Number(quartoSelecionado.preco_diaria).toFixed(2)} / noite
+            </p>
             <form onSubmit={handleCriarReserva}>
-              {usuario.tipo === 'admin' && (
+              {usuario && usuario.tipo === 'admin' && (
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem' }}>Selecionar Hóspede:</label>
-                  <select 
-                    className="form-input" 
+                  <select
+                    className="form-input"
                     style={{ width: '100%' }}
-                    value={usuarioSelecionadoId} 
+                    value={usuarioSelecionadoId}
                     onChange={(e) => setUsuarioSelecionadoId(e.target.value)}
                     required
                   >
@@ -665,16 +690,36 @@ function App() {
                   </select>
                 </div>
               )}
-
+              
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>Data Check-in:</label>
-              <input type="date" className="form-input" style={{ width: '100%', marginBottom: '1rem' }} value={dataCheckin} onChange={(e) => setDataCheckin(e.target.value)} required />
+              <input 
+                type="date" 
+                className="form-input" 
+                style={{ width: '100%', marginBottom: '1rem' }} 
+                value={dataCheckin} 
+                onChange={(e) => setDataCheckin(e.target.value)} 
+                required 
+              />
               
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>Data Check-out:</label>
-              <input type="date" className="form-input" style={{ width: '100%', marginBottom: '1rem' }} value={dataCheckout} onChange={(e) => setDataCheckout(e.target.value)} required />
-
+              <input 
+                type="date" 
+                className="form-input" 
+                style={{ width: '100%', marginBottom: '1rem' }} 
+                value={dataCheckout} 
+                onChange={(e) => setDataCheckout(e.target.value)} 
+                required 
+              />
+              
               <button type="submit" className="submit-btn" style={{ width: '100%' }}>Confirmar Reserva</button>
             </form>
-            <button className="action-btn" style={{ width: '100%', marginTop: '0.5rem', background: '#555' }} onClick={() => setQuartoSelecionado(null)}>Cancelar</button>
+            <button 
+              className="action-btn" 
+              style={{ width: '100%', marginTop: '0.5rem', background: '#555' }} 
+              onClick={() => setQuartoSelecionado(null)}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       )}
