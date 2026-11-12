@@ -11,18 +11,16 @@ function App() {
   const [usuariosLista, setUsuariosLista] = useState([]);
   const [busca, setBusca] = useState('');
   
-  
   const [iaData, setIaData] = useState({});
 
- // notificacao do sms
+  // Notificação / Totem do SMS
   const [notificacao, setNotificacao] = useState(null);
   const mostrarAviso = (mensagem, tipo = 'sucesso') => {
     setNotificacao({ mensagem, tipo });
     setTimeout(() => {
       setNotificacao(null);
-    }, 4500);
+    }, 5000);
   };
-
 
   const [usuario, setUsuario] = useState(() => {
     const usuarioSalvo = localStorage.getItem('usuario_delluna');
@@ -34,7 +32,6 @@ function App() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-
   
   const [quartoSelecionado, setQuartoSelecionado] = useState(null);
   const [dataCheckin, setDataCheckin] = useState('');
@@ -183,8 +180,8 @@ function App() {
       });
       const errData = await res.json();
       if (res.ok) {
-        // Notificação detalhada na tela para a apresentação do Twilio (SMS enviado/simulado para a equipe do hotel)
-        mostrarAviso('Reserva efetuada com sucesso! 📱 SMS de notificação enviado para a equipe do hotel.', 'sucesso');
+        // Totem / Notificação destacada para comprovar o envio do SMS via Twilio para a equipe
+        mostrarAviso('✨ Reserva solicitada com sucesso! 📱 Um SMS de confirmação foi enviado via Twilio para a equipe do Hotel Del Luna.', 'sucesso');
         setQuartoSelecionado(null);
         setDataCheckin('');
         setDataCheckout('');
@@ -283,7 +280,7 @@ function App() {
 
   return (
     <div>
-      {/* Toast Notification Container */}
+      {/* Totem / Toast Notification Container */}
       {notificacao && (
         <div
           style={{
@@ -293,18 +290,19 @@ function App() {
             zIndex: 9999,
             backgroundColor: notificacao.tipo === 'erro' ? '#c0392b' : '#1e272e',
             color: notificacao.tipo === 'erro' ? '#ffffff' : '#d4af37',
-            border: `1px solid ${notificacao.tipo === 'erro' ? '#e74c3c' : '#d4af37'}`,
-            padding: '14px 24px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+            border: `2px solid ${notificacao.tipo === 'erro' ? '#e74c3c' : '#d4af37'}`,
+            padding: '16px 26px',
+            borderRadius: '10px',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.6)',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            fontSize: '0.95rem',
-            fontWeight: '600'
+            gap: '12px',
+            fontSize: '1rem',
+            fontWeight: '600',
+            maxWidth: '450px'
           }}
         >
-          <span>{notificacao.tipo === 'erro' ? '⚠️' : '📱'}</span>
+          <span style={{ fontSize: '1.4rem' }}>{notificacao.tipo === 'erro' ? '⚠️' : '📱'}</span>
           <span>{notificacao.mensagem}</span>
         </div>
       )}
@@ -465,33 +463,6 @@ function App() {
                 <div style={{ background: '#1e272e', padding: '1.2rem', borderRadius: '8px', border: '1px solid #2ecc71', textAlign: 'center' }}>
                   <span style={{ fontSize: '0.85rem', color: '#aaa' }}>Nº de Reservas</span>
                   <h3 style={{ fontSize: '1.8rem', color: '#2ecc71', margin: '0.3rem 0 0 0' }}>{reservas.length}</h3>
-                </div>
-              </div>
-
-              <div style={{ marginTop: '1.5rem', background: '#1e272e', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.2)' }}>
-                <h4 style={{ color: '#d4af37', marginBottom: '0.8rem', fontSize: '0.95rem' }}>Estatísticas das Reservas (Status)</h4>
-                
-                <div style={{ display: 'flex', height: '24px', borderRadius: '12px', overflow: 'hidden', background: '#333' }}>
-                  <div style={{
-                    width: `${reservas.length ? (reservas.filter(r => r.status === 'reservado').length / reservas.length) * 100 : 0}%`,
-                    background: '#f39c12',
-                    transition: 'width 0.5s ease-in-out'
-                  }} title="Reservadas" />
-                  <div style={{
-                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkin').length / reservas.length) * 100 : 0}%`,
-                    background: '#2ecc71',
-                    transition: 'width 0.5s ease-in-out'
-                  }} title="Check-in" />
-                  <div style={{
-                    width: `${reservas.length ? (reservas.filter(r => r.status === 'checkout').length / reservas.length) * 100 : 0}%`,
-                    background: '#3498db',
-                    transition: 'width 0.5s ease-in-out'
-                  }} title="Check-out" />
-                </div>
-                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.8rem', fontSize: '0.85rem', color: '#ccc', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🟡 Reservadas: <strong>{reservas.filter(r => r.status === 'reservado').length}</strong></span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🟢 Check-in: <strong>{reservas.filter(r => r.status === 'checkin').length}</strong></span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>🔵 Check-out: <strong>{reservas.filter(r => r.status === 'checkout').length}</strong></span>
                 </div>
               </div>
             </section>

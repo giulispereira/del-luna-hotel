@@ -9,10 +9,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const sql = neon(process.env.DATABASE_URL);
 
-
 const ai = new GoogleGenAI({});
 
-// inicializa o cliente do twilio para SMS
+
 const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
@@ -20,7 +19,6 @@ const twilioClient = twilio(
 
 app.use(cors());
 app.use(express.json());
-
 
 app.post('/login', async (req, res) => {
   try {
@@ -110,7 +108,7 @@ app.get('/quartos/:id/ia-info', async (req, res) => {
   } catch (error) {
     console.error('Erro na consulta à IA:', error);
     res.json({
-      iaInfo: "- Excelente isolamento acústico e ambiente relaxante\n- Iluminação acolhedora e alto padrão de conforto",
+      iaInfo: "- Excelente isolamento acústico e ambiente relaxante\nIluminação acolhedora e alto padrão de conforto",
       fonte: "Informações geradas por IA"
     });
   }
@@ -193,7 +191,8 @@ app.post('/reservas', async (req, res) => {
       RETURNING *
     `;
 
-    // --- DISPARO DE SMS VIA TWILIO ---
+    // --- DISPARO DE SMS VIA TWILIO COM COMPROVANTE ---
+    let twilioSidGerado = null;
     try {
       const hospedeRes = await sql`SELECT nome, email FROM usuarios WHERE id = ${idHospedeValido}`;
       const quartoRes = await sql`SELECT numero, tipo FROM quartos WHERE id = ${idQuartoValido}`;
@@ -204,20 +203,25 @@ app.post('/reservas', async (req, res) => {
 
         const textoMensagem = `Hotel Del Luna: Ola ${hospede.nome}, reserva confirmada para o Quarto ${quarto.numero} (${quarto.tipo}).`;
 
-        await twilioClient.messages.create({
+        const respostaTwilio = await twilioClient.messages.create({
           body: textoMensagem,
-          from: '+17372508034',
+          from: process.env.TWILIO_PHONE_NUMBER || '+17372508034',
           to: '+5553981353131'
         });
         
-        console.log('SMS enviado com sucesso via Twilio!');
+        twilioSidGerado = respostaTwilio.sid;
+        console.log('✅ SMS processado pelo Twilio com sucesso! SID:', twilioSidGerado);
       }
     } catch (twilioError) {
-      console.error('Erro detalhado do Twilio:', twilioError);
+      console.error('❌ Erro detalhado do Twilio (verifique suas credenciais no .env):', twilioError);
     }
-    // ---------------------------------
+    // ------------------------------------------------
 
-    res.status(201).json(novaReserva[0]);
+    res.status(201).json({
+      ...novaReserva[0],
+      twilioSid: twilioSidGerado,
+      avisoTwilio: twilioSidGerado ? "Comunicação com Twilio realizada com sucesso!" : "Reserva salva (verifique logs do Twilio)."
+    });
   } catch (error) {
     console.error('Erro detalhado da reserva:', error);
     res.status(500).json({ erro: `Erro ao processar reserva: ${error.message}` });
